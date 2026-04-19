@@ -1,13 +1,23 @@
 version: '3.8'
 
 services:
-  api:
-    build: .
+  chromadb:
+    image: chromadb/chroma:latest
     ports:
       - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - APP_ENV=production
+      - IS_PERSISTENT=TRUE
+
+  app:
+    build: .
+    depends_on:
+      - chromadb
+    env_file:
+      - .env
     volumes:
       - ./data:/app/data
-      - ./chroma_db:/app/chroma_db
+
+volumes:
+  chroma_data:
